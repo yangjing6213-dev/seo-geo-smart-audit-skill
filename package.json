@@ -1,0 +1,17 @@
+{
+  "name": "searchscope",
+  "version": "1.4.1",
+  "private": true,
+  "description": "Read-only SEO/GEO auditor for public independent websites.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill.git"
+  },
+  "scripts": {
+    "start": "python app.py",
+    "test": "python -m unittest discover -s tests -v && python scripts/test_site_audit.py",
+    "check:python": "python -m compileall -q app.py scripts tests",
+    "check:js": "node --check web/app.js"
+  }
+}

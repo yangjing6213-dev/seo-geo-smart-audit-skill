@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta id="page-description" name="description" content="输入网址，检查独立站 SEO/GEO 基础，找出流量卡点并获得带证据的修复方案。"/>
+    <link rel="icon" href="data:,"/>
+    <title>SearchScope｜独立站 SEO/GEO 智能巡检</title>
+    <link rel="stylesheet" href="styles.css"/>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="site-header">
+        <a class="creator-lockup" href="https://www.enhe-tech.com.cn" target="_blank" rel="noreferrer">
+          <span class="creator-mark" aria-hidden="true">EN</span>
+          <span class="creator-copy"><strong data-i18n="creator.name">ENHE AI工作室</strong><small data-i18n="header.subtitle">一个不会让你失望的AI网站</small></span>
+        </a>
+        <div class="header-meta">
+          <div id="language-switcher" class="language-switcher" role="group" aria-label="语言 / Language">
+            <button class="language-option active" type="button" data-language="zh-CN" aria-pressed="true">中文</button>
+            <button class="language-option" type="button" data-language="en" aria-pressed="false">EN</button>
+          </div>
+          <span class="header-status"><i></i> <span data-i18n="header.status">在线工具</span></span>
+          <a href="https://www.enhe-tech.com.cn" target="_blank" rel="noreferrer">enhe-tech.com.cn <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-main">
+          <div class="eyebrow"><span class="pulse"></span> <span data-i18n="hero.eyebrow">公开网站检查</span> <span class="eyebrow-rule"></span> <span data-i18n="creator.name">ENHE AI工作室</span></div>
+          <h1 id="page-title"><span data-i18n="hero.title">SearchScope</span><em data-i18n="hero.subtitle">独立站 SEO/GEO 智能巡检</em></h1>
+          <p class="hero-copy" data-i18n="hero.copy">
+            输入网址，一次看清搜索抓取、收录、页面结构、多语言和 AI 答案引擎可见性。报告会告诉你哪些做对了、哪里可能丢流量、先改什么，以及怎么验证。
+          </p>
+          <div class="hero-points" aria-label="巡检范围">
+            <span data-i18n="hero.point1">技术 SEO</span><span data-i18n="hero.point2">多语言</span><span data-i18n="hero.point3">结构化数据</span><span data-i18n="hero.point4">GEO 可引用性</span>
+          </div>
+        </div>
+        <aside class="hero-aside" aria-label="工具信息">
+          <p class="aside-label">CREATED BY</p>
+          <strong data-i18n="creator.name">ENHE AI工作室</strong>
+          <p data-i18n="hero.aside.desc">把流量问题拆成能看懂、能执行、能验收的清单。</p>
+          <a href="https://www.enhe-tech.com.cn" target="_blank" rel="noreferrer"><span data-i18n="hero.aside.link">访问工作室官网</span> <span aria-hidden="true">↗</span></a>
+          <div class="aside-metrics">
+            <div><b>300</b><span data-i18n="hero.metric1">页上限</span></div>
+            <div><b>4</b><span data-i18n="hero.metric2">证据状态</span></div>
+            <div><b>0</b><span data-i18n="hero.metric3">生产改动</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="audit-panel" aria-labelledby="audit-form-title">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker"><span data-i18n="audit.step">01 / 开始检查</span></p>
+            <h2 id="audit-form-title" data-i18n="audit.title">先输入你的网站</h2>
+          </div>
+          <p class="read-only-badge" data-i18n="audit.badge">仅公开 URL · 不登录 · 不修改站点</p>
+        </div>
+        <form id="audit-form" novalidate="">
+          <label class="url-field" for="target-url">
+            <span data-i18n="audit.urlLabel">目标站点</span>
+            <input id="target-url" name="url" type="url" inputmode="url" placeholder="https://example.com" autocomplete="url" required=""/>
+          </label>
+          <label class="pages-field" for="max-pages">
+            <span data-i18n="audit.pagesLabel">巡检页数</span>
+            <select id="max-pages" name="max-pages">
+              <option value="10" data-i18n="audit.pages10">10 页 · 快速</option>
+              <option value="25" selected="" data-i18n="audit.pages25">25 页 · 推荐</option>
+              <option value="50" data-i18n="audit.pages50">50 页 · 深度</option>
+              <option value="100" data-i18n="audit.pages100">100 页 · 完整</option>
+              <option value="300" data-i18n="audit.pages300">300 页 · 最大</option>
+            </select>
+          </label>
+          <button id="submit-button" class="primary-button" type="submit">
+            <span data-i18n="audit.submit">输入网址并开始巡检</span><span aria-hidden="true">↗</span>
+          </button>
+        </form>
+        <p id="form-message" class="form-message" role="status" data-i18n="audit.message">
+          默认阻止私网、回环和保留地址；不会提交表单、写入数据或执行答案引擎查询。
+        </p>
+      </section>
+
+      <section id="empty-state" class="empty-state" aria-label="巡检说明">
+        <div>
+          <p class="section-kicker"><span data-i18n="empty.step">02 / 报告会显示</span></p>
+          <h2 data-i18n="empty.title">一份报告，帮你决定先改哪里。</h2>
+        </div>
+        <ul>
+          <li><strong>verified</strong> <span data-i18n="empty.verified">当前静态抓取直接证明</span></li>
+          <li><strong>render required</strong> <span data-i18n="empty.render">需浏览器渲染后确认</span></li>
+          <li><strong>external data required</strong> <span data-i18n="empty.external">需 GSC、CrUX 或真实平台探测</span></li>
+        </ul>
+      </section>
+
+      <section id="report" class="report hidden" aria-live="polite">
+        <div class="report-topline">
+          <div>
+            <p class="section-kicker"><span data-i18n="report.step">02 / 巡检报告</span></p>
+            <h2 id="report-target">巡检结果</h2>
+            <p id="report-meta" class="report-meta"></p>
+          </div>
+          <div class="report-actions">
+            <button id="download-markdown" class="secondary-button" type="button" data-i18n="report.downloadMd">下载 Markdown</button>
+            <button id="download-json" class="secondary-button" type="button" data-i18n="report.downloadJson">下载 JSON</button>
+            <button id="download-prompts" class="secondary-button" type="button" data-i18n="report.downloadPrompts">下载智能体提示词</button>
+          </div>
+        </div>
+
+        <section class="score-section" aria-labelledby="score-title">
+          <div class="score-overall">
+            <p class="section-kicker" data-i18n="report.scoreLabel">网站健康度</p>
+            <div class="score-number"><strong id="score-value">--</strong><span>/ 100</span></div>
+            <p id="score-label" class="score-label" data-i18n="report.scoreWaiting">等待评估</p>
+          </div>
+          <div class="score-copy">
+            <h3 id="score-title" data-i18n="report.scoreTitle">这次检查结果怎么样</h3>
+            <p id="score-summary" data-i18n="report.scoreSummary">完成检查后，这里会说明网站当前基础和最该先处理的问题。</p>
+            <div class="score-facts">
+              <div><span data-i18n="report.coverage">证据覆盖率</span><strong id="score-coverage">--%</strong></div>
+              <div><span data-i18n="report.pending">待补证据</span><strong id="score-pending">-- 项</strong></div>
+            </div>
+          </div>
+          <div class="score-breakdown">
+            <p class="section-kicker" data-i18n="report.deductions">扣分依据</p>
+            <div id="score-deductions" class="score-deductions"></div>
+          </div>
+        </section>
+
+        <div id="summary-cards" class="summary-grid"></div>
+
+        <div class="report-overview-grid">
+          <section class="strengths-section" aria-labelledby="strengths-title">
+            <div class="section-heading-with-filter">
+              <div>
+                <p class="section-kicker" data-i18n="report.strengthsLabel">已经具备</p>
+                <h3 id="strengths-title" data-i18n="report.strengthsTitle">当前 SEO/GEO 优势</h3>
+              </div>
+              <p class="evidence-note" data-i18n="report.evidenceNote">基于本次已抓取样本</p>
+            </div>
+            <div id="strengths-list" class="strengths-grid"></div>
+          </section>
+
+          <aside class="coverage-card" aria-labelledby="coverage-title">
+            <p class="section-kicker" data-i18n="report.coverageLabel">覆盖范围</p>
+            <h3 id="coverage-title" data-i18n="report.coverageTitle">已抓取页面</h3>
+            <div id="coverage-list" class="coverage-list"></div>
+          </aside>
+        </div>
+
+        <section class="findings-section" aria-labelledby="findings-title">
+          <div class="section-heading-with-filter">
+            <div>
+              <p class="section-kicker" data-i18n="report.findingsLabel">问题与方案</p>
+              <h3 id="findings-title" data-i18n="report.findingsTitle">按优先级处理</h3>
+            </div>
+            <div id="severity-filters" class="filter-group" aria-label="按严重级别筛选"></div>
+          </div>
+          <div id="findings-list" class="findings-list"></div>
+        </section>
+
+        <section class="recommendations-section" aria-labelledby="recommendations-title">
+          <div>
+            <p class="section-kicker" data-i18n="report.recLabel">其他优化建议</p>
+            <h3 id="recommendations-title" data-i18n="report.recTitle">建议的后续路线</h3>
+          </div>
+          <div id="recommendations-list" class="recommendations-list"></div>
+        </section>
+
+        <section class="agent-prompts-section" aria-labelledby="agent-prompts-title">
+          <div class="section-heading-with-filter">
+            <div>
+              <p class="section-kicker" data-i18n="report.agentLabel">交给智能体执行</p>
+              <h3 id="agent-prompts-title" data-i18n="report.agentTitle">修复提示词</h3>
+            </div>
+            <div id="agent-selector" class="agent-selector" aria-label="选择智能体"></div>
+          </div>
+          <div class="prompt-toolbar">
+            <div><strong id="agent-prompt-name">Codex</strong><a id="agent-prompt-website" href="https://openai.com/codex/" target="_blank" rel="noreferrer"><span data-i18n="report.visitWebsite">访问官网</span> ↗</a></div>
+            <button id="copy-agent-prompt" class="secondary-button compact" type="button" data-i18n="report.copyPrompt">复制提示词</button>
+          </div>
+          <pre id="agent-prompt-content" class="agent-prompt-content"></pre>
+        </section>
+      </section>
+
+      <section class="agent-directory" aria-labelledby="agent-directory-title">
+        <div class="agent-directory-heading">
+          <p class="section-kicker" data-i18n="agent.directoryLabel">执行工具</p>
+          <h2 id="agent-directory-title" data-i18n="agent.directoryTitle">选择你的智能体</h2>
+          <p data-i18n="agent.directoryDesc">将报告生成的提示词粘贴到对应工具，并在目标代码仓库中执行。</p>
+        </div>
+        <div class="agent-links">
+          <a href="https://openai.com/codex/" target="_blank" rel="noreferrer"><span>CD</span><strong>Codex</strong><small data-i18n="agent.codex">OpenAI 编程智能体</small><b>↗</b></a>
+          <a href="https://openclaw.ai/" target="_blank" rel="noreferrer"><span>OC</span><strong>OpenClaw</strong><small data-i18n="agent.openclaw">开源个人智能体</small><b>↗</b></a>
+          <a href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noreferrer"><span>HA</span><strong>Hermes Agent</strong><small>Nous Research</small><b>↗</b></a>
+          <a href="https://claude.com/product/claude-code" target="_blank" rel="noreferrer"><span>CC</span><strong>Claude Code</strong><small data-i18n="agent.claude">Anthropic 编程智能体</small><b>↗</b></a>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div><strong data-i18n="footer.title">SearchScope</strong><span data-i18n="footer.tagline">只读 · 可复现 · 证据优先</span></div>
+        <div><span data-i18n="footer.creator">创作者：</span><a href="https://www.enhe-tech.com.cn" target="_blank" rel="noreferrer" data-i18n="creator.name">ENHE AI工作室</a></div>
+      </footer>
+    </main>
+    <script src="app.js" defer></script>
+  </body>
+</html>

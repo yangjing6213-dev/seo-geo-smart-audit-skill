@@ -1,0 +1,35 @@
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+
+# Local audit evidence and generated reports
+.local-audit/
+PRE-PUBLISH-REPORT.md
+audit.json
+audit.md
+audit.html
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node and build output
+node_modules/
+build/
+dist/
+coverage/
+htmlcov/
+*.egg-info/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
