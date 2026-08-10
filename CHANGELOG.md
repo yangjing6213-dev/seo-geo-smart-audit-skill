@@ -15,3 +15,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Product display name standardized as SearchScope while retaining the stable Skill identifier `independent-site-seo-geo-auditor`.
+- Documented both web entry paths: self-install from GitHub and the separately deployed online entry point.
+- Clarified that `127.0.0.1:8000` is local to the computer running the app and is not a public address.

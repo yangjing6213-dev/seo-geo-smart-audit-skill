@@ -56,15 +56,29 @@ python scripts/site_audit.py https://example.com \
 
 Private, loopback, reserved, and credential-bearing URLs are rejected by default. Crawling remains on the target origin.
 
-## Web interface
+## Web entry points
+
+SearchScope provides two ways to use the web interface.
+
+### Option 1: Self-install
+
+Use this option when you want to run SearchScope on your own computer:
 
 ```bash
+git clone https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill.git
+cd seo-geo-smart-audit-skill
 python app.py
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000). Set the `PORT` environment variable to use another port.
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000). This address is available only on the computer running the app; it is not a public URL. Set the `PORT` environment variable to use another port.
+
+### Option 2: Online access
+
+No installation is required. Open [SearchScope online](https://enheai-seo-geo.coze.site/). The online entry point is deployed separately from the local version in this repository; its availability is determined by that URL.
 
 The public read-only audit endpoint is `POST /api/audit`. Send `{"url":"https://example.com","max_pages":25}` and request no more than 300 same-origin pages. `GET /api/health` reports the read-only mode and audit capability status.
+
+See [Web entry points](docs/WEB_ENTRY.md) for the two access paths.
 
 ## Validation
 

@@ -58,13 +58,27 @@ python scripts/site_audit.py https://example.com \
 
 ## 网页入口
 
+SearchScope 提供两种网页使用方式，按你的使用场景选择即可。
+
+### 方案一：自行安装
+
+适合希望在自己的电脑上运行、由自己控制巡检环境的用户：
+
 ```bash
+git clone https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill.git
+cd seo-geo-smart-audit-skill
 python app.py
 ```
 
-打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。可通过 `PORT` 环境变量修改端口。
+然后打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。这个地址只在当前运行程序的电脑上有效，不是公网地址。可通过 `PORT` 环境变量修改端口。
+
+### 方案二：在线使用
+
+无需安装，直接打开 [SearchScope 在线入口](https://enheai-seo-geo.coze.site/)。在线入口与 GitHub 仓库中的本地运行版本分开部署，在线服务的实际可用性以该地址为准。
 
 公开只读巡检接口：`POST /api/audit`。请求体为 `{"url":"https://example.com","max_pages":25}`，最多巡检 300 个同源页面。`GET /api/health` 返回只读模式和巡检能力状态。
+
+两种入口的详细说明见 [网页入口说明](docs/WEB_ENTRY.md)。
 
 ## 验证
 
