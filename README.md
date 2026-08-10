@@ -1,6 +1,16 @@
 # SearchScope｜独立站 SEO/GEO 智能巡检
 
-[English](README.en.md) | 简体中文
+<p align="center">
+  <img src="assets/logo.png" alt="项目 Logo" width="180">
+</p>
+
+SearchScope 让网站更容易被搜索引擎与 AI 发现、理解和引用。
+
+[简体中文](README.md) | [English](README.en.md)
+
+[![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
+
+![项目功能封面](assets/project-cover.png)
 
 SearchScope 是一个面向公开独立站的只读 SEO/GEO 巡检 Skill。它检查抓取与收录信号、元数据、canonical、hreflang、结构化数据、AI 爬虫可访问性和内容可引用性，并生成带证据、优先级和验收方法的修复清单。
 

@@ -1,6 +1,16 @@
 # SearchScope | Independent Site SEO/GEO Auditor
 
-English | [简体中文](README.md)
+<p align="center">
+  <img src="assets/logo-en.png" alt="Project logo" width="180">
+</p>
+
+SearchScope makes websites easier for search engines and AI systems to discover, understand, and cite.
+
+[简体中文](README.md) | [English](README.en.md)
+
+[![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
+
+![Project workflow cover](assets/project-cover-en.png)
 
 SearchScope is a read-only SEO/GEO auditing Skill for public independent websites. It checks crawl and index signals, metadata, canonical URLs, hreflang, structured data, AI crawler access, and citation readiness, then produces prioritized fixes with evidence and verification steps.
 

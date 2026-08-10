@@ -5,6 +5,8 @@
 
 # Local audit evidence and generated reports
 .local-audit/
+.local-backup/
+candidates/
 PRE-PUBLISH-REPORT.md
 audit.json
 audit.md
