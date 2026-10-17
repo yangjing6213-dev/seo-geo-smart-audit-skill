@@ -10,6 +10,8 @@ SearchScope makes websites easier for search engines and AI systems to discover,
 
 [![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
 
+![Python](https://img.shields.io/badge/python-%233670A0.svg?style=for-the-badge&logo=python&logoColor=ffdd54) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/css-%23663399.svg?style=for-the-badge&logo=css&logoColor=white) [![License](https://img.shields.io/github/license/yangjing6213-dev/seo-geo-smart-audit-skill?style=for-the-badge)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/blob/main/LICENSE)
+
 ![Project workflow cover](assets/project-cover-en.png)
 
 SearchScope is a read-only SEO/GEO auditing Skill for public independent websites. It checks crawl and index signals, metadata, canonical URLs, hreflang, structured data, AI crawler access, and citation readiness, then produces prioritized fixes with evidence and verification steps.

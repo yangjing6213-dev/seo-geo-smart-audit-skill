@@ -10,6 +10,8 @@ SearchScope 让网站更容易被搜索引擎与 AI 发现、理解和引用。
 
 [![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
 
+![Python](https://img.shields.io/badge/python-%233670A0.svg?style=for-the-badge&logo=python&logoColor=ffdd54) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/css-%23663399.svg?style=for-the-badge&logo=css&logoColor=white) [![License](https://img.shields.io/github/license/yangjing6213-dev/seo-geo-smart-audit-skill?style=for-the-badge)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/blob/main/LICENSE)
+
 ![项目功能封面](assets/project-cover.png)
 
 SearchScope 是一个面向公开独立站的只读 SEO/GEO 巡检 Skill。它检查抓取与收录信号、元数据、canonical、hreflang、结构化数据、AI 爬虫可访问性和内容可引用性，并生成带证据、优先级和验收方法的修复清单。
