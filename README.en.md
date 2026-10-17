@@ -1,9 +1,5 @@
 # SearchScope | Independent-Site SEO/GEO Auditor
 
-<p align="center">
-  <img src="assets/logo-en.png" alt="SearchScope logo" width="180">
-</p>
-
 > Helps independent website owners and AI creators review public-site SEO and GEO basics, then turn evidence into a practical improvement list.
 
 A website opening in a browser does not mean search engines and AI tools can read it correctly. SearchScope checks public-page evidence and separates confirmed findings from items that need more information. It is read-only: it will not change your website, and it does not promise rankings or AI citations.
@@ -51,11 +47,11 @@ You usually only need to provide the website homepage. Information such as site 
 <a id="see-results"></a>
 ## 2. See the output
 
-![SearchScope project cover](assets/project-cover-en.png)
+![Actual SearchScope local web audit result](assets/screenshots/enhe-tech-site-audit-en.png)
 
-This is a project cover, not a screenshot of the running application. The scores, traffic trends, and issue counts are illustrative and must not be treated as actual audit results or performance claims.
+On 2026-10-18, SearchScope's local web app ran a read-only audit of [ENHE AI's website](https://www.enhe-tech.com.cn/): 10 HTML pages were read with 0 fetch failures. The screenshot shows a score of 100/100 and 88% evidence completeness for that run. Real-world page experience metrics and brand mentions or citations in answer engines still require external data. This result reflects only the sampled pages and does not promise rankings, traffic, or AI citations.
 
-The repository does not include a complete audit report for a real website, so this README does not invent a score or customer example. You can review the [report template](assets/audit-report-template.md) to see how scope, evidence, issue levels, and acceptance checks are recorded. The template is not a completed report.
+You can also review the [report template](assets/audit-report-template.md) to see how a complete report records scope, evidence, issue levels, and acceptance checks.
 
 <a id="who-is-it-for"></a>
 ## 3. Who is it for?
@@ -230,6 +226,7 @@ The local web app and command-line tool fetch pages and produce rule-based findi
 | references/audit-rubric.md | Issue levels and scoring rules. |
 | assets/audit-report-template.md | Report template, not a completed audit. |
 | assets/logo-en.png, assets/project-cover-en.png | Project logo and cover. |
+| assets/screenshots/ | Actual audit screens shown in the README. |
 | assets/ASSET_PROVENANCE.md | Source and use record for project images. |
 | docs/browser-rendering.md | Optional browser-review setup and limits. |
 | docs/external-evidence.md | JSON format for search-platform and AI-answer sample data. |

@@ -1,9 +1,5 @@
 # SearchScope｜独立站 SEO/GEO 智能巡检
 
-<p align="center">
-  <img src="assets/logo.png" alt="SearchScope 标志" width="180">
-</p>
-
 > 帮助独立站经营者和 AI 创作者检查公开网站的 SEO 与 GEO 基础，并整理出带证据的改进清单。
 
 网站能打开，不代表搜索引擎和 AI 工具都能正确读取它。SearchScope 会按公开页面上的证据逐项检查，并把“已经确认的问题”和“还需要更多资料才能判断的部分”分开说明。它只做巡检，不会替你修改网站，也不保证排名或 AI 引用结果。
@@ -51,11 +47,11 @@ SearchScope 是一个面向公开独立网站的只读巡检工具，包含三�
 <a id="see-results"></a>
 ## 二、先看效果
 
-![SearchScope 项目封面](assets/project-cover.png)
+![SearchScope 本地网页入口的实际巡检结果](assets/screenshots/enhe-tech-site-audit-zh-CN.png)
 
-这是项目封面，不是程序运行截图。图中的评分、流量趋势和问题数量都是示意内容，不能作为 SearchScope 的真实测试结果或效果承诺。
+2026-10-18，SearchScope 本地网页入口对[恩禾 AI 官网](https://www.enhe-tech.com.cn/)进行了 10 页只读巡检：读取了 10 个 HTML 页面，0 个页面读取失败。截图显示当次得分为 100/100、证据完备度为 88%；网页实际速度体验指标，以及品牌在真实 AI 答案中的提及和引用情况，仍需外部数据验证。该结果只反映本次页面样本，不代表搜索排名、流量或 AI 引用承诺。
 
-仓库目前没有附上某个真实网站的完整巡检报告，因此这里不展示虚构的评分或案例。你可以先查看[报告模板](assets/audit-report-template.md)，了解正式报告会怎样记录范围、证据、问题等级和验收方法。模板本身不是已经运行完成的报告。
+你也可以查看[报告模板](assets/audit-report-template.md)，了解完整报告会怎样记录范围、证据、问题等级和验收方法。
 
 <a id="who-is-it-for"></a>
 ## 三、适合谁用？
@@ -230,6 +226,7 @@ python scripts/site_audit.py https://example.com --max-pages 25 --json-out audit
 | references/audit-rubric.md | 问题分级与评分规则。 |
 | assets/audit-report-template.md | 报告模板，不是实际运行结果。 |
 | assets/logo.png、assets/project-cover.png | 项目标志和封面图。 |
+| assets/screenshots/ | README 中展示的实际巡检画面。 |
 | assets/ASSET_PROVENANCE.md | 项目图片素材的来源与使用记录。 |
 | docs/browser-rendering.md | 可选浏览器复核的安装方法和限制。 |
 | docs/external-evidence.md | 搜索平台和 AI 答案抽样数据的 JSON 格式。 |
