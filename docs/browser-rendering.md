@@ -11,6 +11,8 @@ python -m pip install -r requirements-renderer.txt
 python -m playwright install chromium
 ```
 
+依赖清单最低要求 Playwright 1.59.0，包含 Chromium 对 CVE-2026-2441 的修复；请勿降级到更低版本。见[上游修复记录](https://github.com/microsoft/playwright/issues/39574)。
+
 安装后，可在网页入口勾选“用浏览器检查页面实际加载后的内容”，或运行：
 
 ```bash
@@ -31,6 +33,8 @@ Install the optional components once from the project folder:
 python -m pip install -r requirements-renderer.txt
 python -m playwright install chromium
 ```
+
+The dependency file requires Playwright 1.59.0 or later, which includes the Chromium fix for CVE-2026-2441. Do not downgrade below that version; see the [upstream fix record](https://github.com/microsoft/playwright/issues/39574).
 
 Then select the browser option in the web app or run:
 
