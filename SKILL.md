@@ -57,6 +57,8 @@ python scripts/site_audit.py https://example.com \
 
 脚本仅使用 Python 标准库，默认阻止私网、回环和保留地址，遵守 robots.txt，限制同源抓取、响应大小和页面数量。需要审计本机测试站时，只有在用户明确授权后才使用 `--allow-private`。
 
+如需检查 JavaScript 加载后的页面元数据，且可选 Playwright/Chromium 已安装，可在命令中追加 `--render-browser`。浏览器复核不能与 `--allow-private` 同时使用；没有安装时不要自动安装，也不要把待渲染项说成已验证。安装方式和限制见 `docs/browser-rendering.md`。
+
 脚本覆盖：
 
 - robots.txt、sitemap 发现与 sitemap 重复 URL
@@ -69,14 +71,16 @@ python scripts/site_audit.py https://example.com \
 
 ### 3. 补充浏览器渲染检查
 
-对首页、一个列表页、一个详情页以及每种主要语言至少抽查一页：
+命令行 `--render-browser` 或本地网页复核选项会自动检查最多 10 个已抓取页面的实际 DOM，提取标题、摘要、canonical、robots、语言、H1 和结构化数据变化。它只允许同站公开读取请求，结果不改变基础评分。
+
+这项检查不覆盖视觉布局、移动端效果、交互可达性、页面速度和核心网页指标。需要这些结论时，再另行用浏览器人工复核：
 
 - 读取渲染后的 `<title>`、meta description、canonical、robots、hreflang。
 - 执行 `document.querySelectorAll('script[type="application/ld+json"]')` 并解析结果。
 - 检查主内容、H1/H2、导航和正文是否在渲染后真实可见。
 - 检查移动端布局、交互可达性和懒加载内容；不要用截图代替 DOM 证据。
 
-若无法使用浏览器，将这些项目保留为 `render_required`。
+若可选浏览器组件未安装或复核失败，将相关项目保留为 `render_required`，并说明尚未取得浏览器证据。浏览器渲染的具体资源限制见 `docs/browser-rendering.md`。
 
 ### 4. 审计 SEO 基础
 

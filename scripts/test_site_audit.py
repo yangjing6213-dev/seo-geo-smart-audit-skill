@@ -69,6 +69,7 @@ Nx962Qzm9haPBbrMmxedst4BGNhSJ3GNTF/pXtZHWcUw1vApZp6cVMEbNo4oLuNl
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from browser_render import BrowserRendererUnavailableError  # noqa: E402
 from html_report import html_report  # noqa: E402
 import site_audit as site_audit_module  # noqa: E402
 from site_audit import (  # noqa: E402
@@ -206,7 +207,7 @@ class FixtureHandler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             self.wfile.write(payload)
-        except BrokenPipeError:
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             pass
 
     def log_message(self, format: str, *args) -> None:  # noqa: A002
@@ -263,6 +264,98 @@ class SiteAuditTests(unittest.TestCase):
         self.assertEqual(2, result["summary"]["html_pages"])
         self.assertEqual("1.4.9", result["meta"].get("engine_version"))
         self.assertEqual(1, result["discovery"]["sitemap_duplicate_url_count"])
+        self.assertIn("Static HTML only", result["meta"]["limitations"][0])
+
+    def test_fetch_url_can_return_bytes_and_safe_redirect_for_browser_requests(self) -> None:
+        server = ThreadingHTTPServer(("127.0.0.1", 0), FixtureHandler)
+        server.request_count = 0
+        server.redirect_location = "/"
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            origin = f"http://127.0.0.1:{server.server_address[1]}"
+            redirect_meta, redirect_body = fetch_url(
+                f"{origin}/redirect-start",
+                timeout=2,
+                max_bytes=10_000,
+                user_agent="test-agent",
+                allow_private=True,
+                return_bytes=True,
+                follow_redirects=False,
+                allowed_origin=origin,
+            )
+            page_meta, page_body = fetch_url(
+                f"{origin}/",
+                timeout=2,
+                max_bytes=10_000,
+                user_agent="test-agent",
+                allow_private=True,
+                return_bytes=True,
+                allowed_origin=origin,
+            )
+
+            self.assertEqual(302, redirect_meta["status"])
+            self.assertEqual(f"{origin}/redirect-middle", redirect_meta["redirect_url"])
+            self.assertEqual(b"", redirect_body)
+            self.assertEqual(200, page_meta["status"])
+            self.assertEqual("utf-8", page_meta["content_charset"])
+            self.assertIsInstance(page_body, bytes)
+            self.assertIn("首页".encode("utf-8"), page_body)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
+    def test_origin_comparison_normalizes_default_ports_and_idn_hosts(self) -> None:
+        self.assertTrue(site_audit_module.same_origin("https://example.com:443/a", "https://example.com/b"))
+        self.assertTrue(site_audit_module.same_origin("http://例子.测试/a", "http://xn--fsqu00a.xn--0zwm56d/b"))
+        self.assertFalse(site_audit_module.same_origin("https://example.com:444/", "https://example.com/"))
+        self.assertFalse(site_audit_module.same_origin("http://example.com:0/", "http://example.com/"))
+        self.assertFalse(site_audit_module.same_origin("https://example.com:99999/", "https://example.com:99999/"))
+
+    def test_browser_fetcher_rejects_cross_origin_redirect_before_second_resolution(self) -> None:
+        server = ThreadingHTTPServer(("127.0.0.1", 0), FixtureHandler)
+        server.request_count = 0
+        server.redirect_location = "http://outside.example/private-target"
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        local_addresses = socket.getaddrinfo(
+            "127.0.0.1",
+            server.server_address[1],
+            type=socket.SOCK_STREAM,
+            flags=socket.AI_NUMERICHOST,
+        )
+        try:
+            origin = f"http://public.example:{server.server_address[1]}"
+            with patch.object(
+                site_audit_module,
+                "resolve_url",
+                return_value=tuple(local_addresses),
+            ) as resolve_url:
+                result, body = fetch_url(
+                    f"{origin}/redirect-middle",
+                    timeout=2,
+                    max_bytes=10_000,
+                    user_agent="test-agent",
+                    allow_private=True,
+                    return_bytes=True,
+                    follow_redirects=False,
+                    allowed_origin=origin,
+                )
+
+            self.assertIsNone(result["status"])
+            self.assertEqual("Redirect target validation failed", result["error"])
+            self.assertEqual(b"", body)
+            self.assertEqual(1, resolve_url.call_count)
+            self.assertEqual(1, server.request_count)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
+    def test_bounded_local_audit_scoring_and_reports(self) -> None:
+        result, _ = self.run_fixture_audit()
+        target = result["meta"]["target"]
         self.assertEqual(200, result["discovery"]["machine_assets"]["/llms.txt"]["status"])
         self.assertIn("sitemap_duplicate_urls", {item["code"] for item in result["findings"]})
 
@@ -306,6 +399,107 @@ class SiteAuditTests(unittest.TestCase):
         self.assertIn("## 智能体执行提示词", markdown)
         self.assertIn("### Codex", markdown)
         self.assertIn("### Hermes Agent", markdown)
+
+    def test_browser_render_rejects_private_override_before_network_access(self) -> None:
+        with (
+            self.assertRaisesRegex(ValueError, "only for public targets"),
+            patch.object(site_audit_module.subprocess, "Popen") as resolver,
+        ):
+            audit_site("http://127.0.0.1/", allow_private=True, render_browser=True)
+        resolver.assert_not_called()
+
+    def test_missing_browser_setup_fails_before_site_requests(self) -> None:
+        with (
+            patch(
+                "browser_render.ensure_browser_runtime",
+                side_effect=BrowserRendererUnavailableError("optional browser setup missing"),
+            ),
+            patch.object(site_audit_module, "fetch_url") as fetcher,
+            self.assertRaises(BrowserRendererUnavailableError),
+        ):
+            audit_site("https://example.com/", render_browser=True)
+        fetcher.assert_not_called()
+
+    def test_browser_mode_explains_that_static_html_still_drives_the_score(self) -> None:
+        def fake_fetch(request_url: str, **_kwargs: object) -> tuple[dict[str, object], str]:
+            if request_url == "https://example.com/":
+                return (
+                    {
+                        "status": 200,
+                        "final_url": request_url,
+                        "content_type": "text/html",
+                        "error": None,
+                        "elapsed_ms": 1,
+                    },
+                    "<html lang='en'><head><title>Static</title></head><body><h1>Page</h1></body></html>",
+                )
+            return (
+                {
+                    "status": 404,
+                    "final_url": request_url,
+                    "content_type": "text/plain",
+                    "error": None,
+                    "elapsed_ms": 1,
+                },
+                "",
+            )
+
+        rendering = {
+            "enabled": True,
+            "eligible_pages": 1,
+            "sampled_pages": 1,
+            "rendered_pages": 1,
+            "failed_pages": 0,
+            "blocked_requests": 0,
+            "affects_score": False,
+            "rendered_html_retained": False,
+        }
+        with (
+            patch("browser_render.ensure_browser_runtime"),
+            patch("browser_render.render_browser_pages", return_value=rendering),
+            patch.object(site_audit_module, "fetch_url", side_effect=fake_fetch),
+        ):
+            result = audit_site("https://example.com/", max_pages=1, delay=0, render_browser=True)
+
+        self.assertEqual(rendering, result["browser_rendering"])
+        self.assertIn("Base score uses static HTML", result["meta"]["limitations"][0])
+
+    def test_browser_observations_do_not_change_score_and_html_escapes_site_content(self) -> None:
+        result, _ = self.run_fixture_audit()
+        score_before = build_score(result)
+        result["browser_rendering"] = {
+            "enabled": True,
+            "eligible_pages": 1,
+            "sampled_pages": 1,
+            "rendered_pages": 1,
+            "failed_pages": 0,
+            "blocked_requests": 2,
+            "affects_score": False,
+            "rendered_html_retained": False,
+        }
+        result["pages"][0]["browser_render"] = {
+            "status": "completed",
+            "http_status": 200,
+            "title": "<script>alert(1)</script>",
+            "meta_description": "Rendered description",
+            "canonical": "https://example.com/",
+            "html_lang": "en",
+            "robots_directive": "",
+            "h1_count": 1,
+            "h1": ["Rendered heading"],
+            "json_ld_static_count": 1,
+            "json_ld_static_valid_count": 1,
+            "differences": ["title", "h1"],
+            "error": None,
+        }
+
+        self.assertEqual(score_before, build_score(result))
+        html = html_report(result)
+        markdown = markdown_report(result)
+        self.assertIn("浏览器渲染观察", html)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html)
+        self.assertNotIn("<script>alert(1)</script>", html)
+        self.assertIn("浏览器渲染观察（补充证据，不参与评分）", markdown)
 
     def test_indexability_scope_removes_false_positive_findings(self) -> None:
         result, _ = self.run_fixture_audit()
@@ -465,6 +659,47 @@ class SiteAuditTests(unittest.TestCase):
         self.assertNotIn("<script>alert('x')</script>", report)
         self.assertNotIn("https://cdn", report)
 
+    def test_evidence_coverage_explains_its_check_item_denominator(self) -> None:
+        result, _ = self.run_fixture_audit()
+
+        self.assertIn("全部检查项的比例", result["score"]["method"])
+        self.assertIn("不代表页面抓取覆盖", result["score"]["method"])
+        self.assertIn("检查证据完备度", markdown_report(result))
+
+    def test_external_evidence_is_summarized_in_reports_and_html_escaped(self) -> None:
+        result, _ = self.run_fixture_audit()
+        result["external_evidence"] = {
+            "search_console": {
+                "period_start": "2026-10-01",
+                "period_end": "2026-10-14",
+                "page_rows": 1,
+                "clicks": 2,
+                "impressions": 10,
+                "ctr_percent": 20.0,
+                "average_position": 4.5,
+            },
+            "answer_engine_samples": [
+                {
+                    "engine": "<img src=x onerror=alert(1)>",
+                    "checked_at": "2026-10-17",
+                    "query_samples": 2,
+                    "queries_with_site_citation": 1,
+                    "citation_rate_percent": 50.0,
+                }
+            ],
+            "affects_score": False,
+            "raw_rows_retained": False,
+        }
+
+        markdown = markdown_report(result)
+        report = html_report(result)
+
+        self.assertIn("外部数据补充（用户导入）", markdown)
+        self.assertIn("抽样引用率 50.0%", markdown)
+        self.assertIn("Supplemental data", report)
+        self.assertIn("&lt;img src=x onerror=alert(1)&gt;", report)
+        self.assertNotIn("<img src=x onerror=alert(1)>", report)
+
     def test_cli_writes_html_report_and_returns_its_path(self) -> None:
         result, _ = self.run_fixture_audit()
 
@@ -487,9 +722,10 @@ class SiteAuditTests(unittest.TestCase):
                         str(markdown_path),
                         "--html-out",
                         str(html_path),
+                        "--render-browser",
                     ],
                 ),
-                patch.object(site_audit_module, "audit_site", return_value=result),
+                patch.object(site_audit_module, "audit_site", return_value=result) as audit_site,
                 patch.object(sys, "stdout", stdout),
             ):
                 exit_code = site_audit_module.main()
@@ -501,6 +737,26 @@ class SiteAuditTests(unittest.TestCase):
             self.assertTrue(markdown_path.is_file())
             self.assertTrue(html_path.is_file())
             self.assertIn("ENHE AI工作室", html_path.read_text(encoding="utf-8"))
+            self.assertTrue(audit_site.call_args.kwargs["render_browser"])
+
+    def test_cli_disallows_private_override_with_browser_rendering(self) -> None:
+        stderr = StringIO()
+        with (
+            patch.object(
+                sys,
+                "argv",
+                ["site_audit.py", "http://127.0.0.1/", "--allow-private", "--render-browser"],
+            ),
+            patch.object(sys, "stderr", stderr),
+            patch.object(site_audit_module.subprocess, "Popen") as resolver,
+            patch.object(site_audit_module, "audit_site") as audit_site,
+        ):
+            exit_code = site_audit_module.main()
+
+        self.assertEqual(2, exit_code)
+        self.assertIn("cannot be combined", stderr.getvalue())
+        resolver.assert_not_called()
+        audit_site.assert_not_called()
 
     def test_ai_bot_policies_keep_categories_and_each_bot(self) -> None:
         self.assertEqual(

@@ -29,11 +29,13 @@ SearchScope is a read-only SEO/GEO auditing Skill for public independent website
 - Assess AI crawler access, entity signals, machine-readable resources, and citation readiness.
 - Generate JSON, Markdown, and self-contained HTML reports.
 - Run a bilingual local web interface for read-only audits of public URLs.
+- Import local JSON summaries from search-platform exports and AI answer samples; raw rows and queries are not stored, and the base score is unchanged.
 
 ## Requirements
 
 - Python 3.10 or later.
-- Runtime code uses only the Python standard library.
+- The default audit uses only the Python standard library.
+- Optional browser rendering requires Playwright and Chromium; see [browser rendering setup](docs/browser-rendering.md).
 - Node.js is optional and used only for JavaScript syntax validation.
 
 ## Install as a Codex Skill
@@ -56,6 +58,8 @@ python scripts/site_audit.py https://example.com \
 
 Private, loopback, reserved, and credential-bearing URLs are rejected by default. Crawling remains on the target origin.
 
+To inspect content added by JavaScript, install the optional components using the [browser rendering setup](docs/browser-rendering.md), then add `--render-browser`. It is off by default, samples up to 10 pages, and does not change the base score.
+
 ## Web entry points
 
 SearchScope provides two ways to use the web interface.
@@ -70,13 +74,17 @@ cd seo-geo-smart-audit-skill
 python app.py
 ```
 
-Then open [http://127.0.0.1:8000](http://127.0.0.1:8000). This address is available only on the computer running the app; it is not a public URL. Set the `PORT` environment variable to use another port.
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000). The app binds only to the local computer, not the LAN. Set `PORT` to use another port. Web audits stop after 180 seconds and expose progress and cancellation controls.
+
+The web form has an optional checkbox for checking content after JavaScript loads. Install Playwright and Chromium first using the [browser rendering setup](docs/browser-rendering.md); the option is off by default.
+
+The local read-only audit endpoint is `POST /api/audit`. Send `{"url":"https://example.com","max_pages":25}` to audit up to 300 same-origin pages. `GET /api/audit/status` reports progress; the web app's cancel button stops the active audit. `GET /api/health` reports service status. See [external evidence import](docs/external-evidence.md) for the optional JSON format.
 
 ### Option 2: Online access
 
 No installation is required. Open [SearchScope online](https://enheai-seo-geo.coze.site/). The online entry point is deployed separately from the local version in this repository; its availability is determined by that URL.
 
-The public read-only audit endpoint is `POST /api/audit`. Send `{"url":"https://example.com","max_pages":25}` and request no more than 300 same-origin pages. `GET /api/health` reports the read-only mode and audit capability status.
+The online entry point is deployed separately and may behave differently.
 
 See [Web entry points](docs/WEB_ENTRY.md) for the two access paths.
 

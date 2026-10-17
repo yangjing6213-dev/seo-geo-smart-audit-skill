@@ -29,11 +29,13 @@ SearchScope 是一个面向公开独立站的只读 SEO/GEO 巡检 Skill。它�
 - 评估 AI 爬虫访问、品牌实体信号、机器可读资源和内容可引用性。
 - 输出 JSON、Markdown 和自包含 HTML 报告。
 - 附带可部署的双语网页入口，仅对公开 URL 执行只读巡检。
+- 可导入本地 JSON 格式的搜索平台和 AI 答案抽样数据；只生成汇总，不保存原始行或查询，也不改变基础评分。
 
 ## 运行要求
 
 - Python 3.10 或更高版本。
-- 运行时仅使用 Python 标准库。
+- 默认巡检仅使用 Python 标准库。
+- 可选浏览器复核需要单独安装 Playwright 和 Chromium，安装方法见[浏览器复核说明](docs/browser-rendering.md)。
 - Node.js 仅用于前端 JavaScript 语法检查，不是运行依赖。
 
 ## 安装为 Codex Skill
@@ -56,6 +58,8 @@ python scripts/site_audit.py https://example.com \
 
 默认阻止私网、回环、保留地址和带凭据的 URL，并仅抓取同源公开页面。
 
+需要额外检查 JavaScript 加载后的页面内容时，可按[浏览器复核说明](docs/browser-rendering.md)安装可选组件，再加上 `--render-browser`。该选项默认关闭，最多检查 10 页，结果不改变基础评分。
+
 ## 网页入口
 
 SearchScope 提供两种网页使用方式，按你的使用场景选择即可。
@@ -70,13 +74,17 @@ cd seo-geo-smart-audit-skill
 python app.py
 ```
 
-然后打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。这个地址只在当前运行程序的电脑上有效，不是公网地址。可通过 `PORT` 环境变量修改端口。
+然后打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。程序只监听本机地址，不向局域网开放。可通过 `PORT` 环境变量修改端口；网页巡检最长运行 180 秒，并支持查看进度和取消。
+
+网页中可选“用浏览器检查页面实际加载后的内容”。使用前需按[浏览器复核说明](docs/browser-rendering.md)安装 Playwright 和 Chromium；默认不启用。
+
+本地只读巡检接口：`POST /api/audit`，请求体为 `{"url":"https://example.com","max_pages":25}`，最多巡检 300 个同源页面。`GET /api/audit/status` 返回进度；网页中的取消按钮会停止当前巡检。`GET /api/health` 返回服务状态。可选 JSON 数据格式见 [外部数据导入说明](docs/external-evidence.md)。
 
 ### 方案二：在线使用
 
 无需安装，直接打开 [SearchScope 在线入口](https://enheai-seo-geo.coze.site/)。在线入口与 GitHub 仓库中的本地运行版本分开部署，在线服务的实际可用性以该地址为准。
 
-公开只读巡检接口：`POST /api/audit`。请求体为 `{"url":"https://example.com","max_pages":25}`，最多巡检 300 个同源页面。`GET /api/health` 返回只读模式和巡检能力状态。
+在线入口独立部署，其行为以在线服务为准。
 
 两种入口的详细说明见 [网页入口说明](docs/WEB_ENTRY.md)。
 
@@ -95,11 +103,13 @@ node --check web/app.js
 SKILL.md                 Codex/Agent Skill 入口
 agents/                  智能体展示配置
 scripts/                 巡检引擎、HTML 渲染器和引擎测试
+scripts/browser_render.py 可选浏览器复核与请求限制
 references/              评分与证据规则
 assets/                  Markdown 报告模板
 app.py                   本地只读网页服务
 web/                     双语用户界面
 tests/                   网页入口测试
+requirements-renderer.txt 可选浏览器依赖
 ```
 
 ## 安全与结果边界

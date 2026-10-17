@@ -130,6 +130,102 @@ def _page_row(page: dict[str, Any]) -> str:
     """
 
 
+def _external_evidence_section(evidence: Any) -> str:
+    if not isinstance(evidence, dict):
+        return ""
+    sections: list[str] = []
+    search_console = evidence.get("search_console")
+    if isinstance(search_console, dict):
+        position = search_console.get("average_position")
+        sections.append(
+            f"""
+            <article class="summary-card">
+              <span class="label">Search Console · {_text(search_console.get('period_start'))} 至 {_text(search_console.get('period_end'))}</span>
+              <strong>{_text(search_console.get('clicks'))} / {_text(search_console.get('impressions'))}</strong>
+              <p>点击 / 展示 · 汇总点击率 {_text(search_console.get('ctr_percent'))}% · 按展示加权平均排名 {_text(position if position is not None else '未提供')}</p>
+            </article>
+            """
+        )
+    for item in evidence.get("answer_engine_samples", []):
+        if not isinstance(item, dict):
+            continue
+        sections.append(
+            f"""
+            <article class="summary-card">
+              <span class="label">答案引擎抽样 · {_text(item.get('checked_at'))}</span>
+              <strong>{_text(item.get('queries_with_site_citation'))} / {_text(item.get('query_samples'))}</strong>
+              <p>{_text(item.get('engine'))} · 抽样引用率 {_text(item.get('citation_rate_percent'))}%</p>
+            </article>
+            """
+        )
+    if not sections:
+        return ""
+    return f"""
+    <section class="report-section" aria-labelledby="external-evidence-title">
+      <div class="section-head">
+        <div><div class="section-index">Supplemental data</div><h2 id="external-evidence-title">外部数据补充</h2></div>
+        <p class="section-intro">由用户导入的聚合数据；原始行和查询内容不会写入报告，也不参与评分。</p>
+      </div>
+      <div class="summary-grid">{''.join(sections)}</div>
+    </section>
+    """
+
+
+def _browser_rendering_section(rendering: Any, pages: list[dict[str, Any]]) -> str:
+    if not isinstance(rendering, dict) or not rendering.get("enabled"):
+        return ""
+    page_cards: list[str] = []
+    field_labels = {
+        "title": "页面标题",
+        "meta_description": "摘要描述",
+        "canonical": "规范网址",
+        "html_lang": "页面语言",
+        "robots_directive": "抓取指令",
+        "h1": "一级标题",
+        "json_ld_static_count": "结构化数据块",
+    }
+    for index, page in enumerate(pages, start=1):
+        observation = page.get("browser_render")
+        if not isinstance(observation, dict):
+            continue
+        differences = observation.get("differences", [])
+        difference_labels = [field_labels.get(item, str(item)) for item in differences]
+        title = observation.get("title") or "未检测到页面标题"
+        description = observation.get("meta_description") or "未检测到摘要描述"
+        h1 = "、".join(str(item) for item in observation.get("h1", [])) or "未检测到一级标题"
+        error_markup = (
+            f"<p>{_text(observation.get('error'))}</p>" if observation.get("error") else ""
+        )
+        page_cards.append(
+            f"""
+            <article class="summary-card">
+              <span class="label">浏览器抽样页面 {index} · {_text(observation.get('status', 'unknown'))} · HTTP {_text(observation.get('http_status', '-'))}</span>
+              <strong>{_text(title)}</strong>
+              <p>摘要描述：{_text(description)}</p>
+              <p>一级标题：{_text(h1)}</p>
+              <p>与静态抓取不同：{_text('、'.join(difference_labels) if difference_labels else '未发现差异')}</p>
+              {error_markup}
+            </article>
+            """
+        )
+    summary_card = f"""
+      <article class="summary-card">
+        <span class="label">浏览器检查汇总</span>
+        <strong>{_text(rendering.get('rendered_pages', 0))} / {_text(rendering.get('sampled_pages', 0))}</strong>
+        <p>已渲染 / 抽样页面；拦截请求 {_text(rendering.get('blocked_requests', 0))} 个；此补充观察不参与评分。</p>
+      </article>
+    """
+    return f"""
+    <section class="report-section" aria-labelledby="browser-rendering-title">
+      <div class="section-head">
+        <div><div class="section-index">Rendered evidence</div><h2 id="browser-rendering-title">浏览器渲染观察</h2></div>
+        <p class="section-intro">最多抽查 10 页；只允许同站公开只读请求。原始渲染 HTML 不保留，观察结果不参与评分。</p>
+      </div>
+      <div class="summary-grid">{summary_card}{''.join(page_cards)}</div>
+    </section>
+    """
+
+
 def html_report(audit: dict[str, Any]) -> str:
     """Return a complete, offline-capable HTML report for an audit result."""
     meta = audit.get("meta", {})
@@ -141,6 +237,10 @@ def html_report(audit: dict[str, Any]) -> str:
     pages = list(audit.get("pages", []))
     limitations = list(meta.get("limitations", []))
     analysis_scope = summary.get("analysis_scope", {})
+    external_evidence_markup = _external_evidence_section(audit.get("external_evidence"))
+    browser_rendering_markup = _browser_rendering_section(
+        audit.get("browser_rendering"), pages
+    )
 
     overall = max(0, min(100, int(score.get("overall", 0) or 0)))
     evidence_coverage = max(0, min(100, int(score.get("evidence_coverage", 0) or 0)))
@@ -560,12 +660,14 @@ def html_report(audit: dict[str, Any]) -> str:
     </section>
 
     <section class="metric-band" aria-label="巡检关键指标">
-      <div class="metric"><span class="metric-value" data-count="{evidence_coverage}">{evidence_coverage}</span><span class="metric-label">证据覆盖率 %</span></div>
+      <div class="metric"><span class="metric-value" data-count="{evidence_coverage}">{evidence_coverage}</span><span class="metric-label">检查证据完备度 %</span></div>
       <div class="metric"><span class="metric-value" data-count="{_text(summary.get('pages_crawled', 0))}">{_text(summary.get('pages_crawled', 0))}</span><span class="metric-label">已抓取页面</span></div>
       <div class="metric"><span class="metric-value" data-count="{len(strengths)}">{len(strengths)}</span><span class="metric-label">已验证优势</span></div>
       <div class="metric"><span class="metric-value" data-count="{verified_count}">{verified_count}</span><span class="metric-label">已验证问题</span></div>
       <div class="metric"><span class="metric-value" data-count="{pending_count}">{pending_count}</span><span class="metric-label">待补证据</span></div>
     </section>
+    {external_evidence_markup}
+    {browser_rendering_markup}
 
     <section class="report-section" id="findings" aria-labelledby="findings-title">
       <div class="section-head reveal">

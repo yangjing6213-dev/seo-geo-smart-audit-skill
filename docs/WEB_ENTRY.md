@@ -14,6 +14,12 @@ python app.py
 
 Open `http://127.0.0.1:8000` on the same computer. `127.0.0.1` is a loopback address: another user's computer cannot use that address to reach your local process.
 
+The app binds only to `127.0.0.1`. Web audits have a 180-second total limit. `GET /api/audit/status` exposes page-count progress, and the interface can cancel the active audit. Cancellation and timeout return an error instead of a partial-success report.
+
+You can optionally select a UTF-8 JSON file containing Search Console metrics or answer-engine citation samples. The app validates and summarizes it in memory; raw rows, query text, and credentials are not stored. See [external evidence format](external-evidence.md).
+
+The audit form also offers optional browser rendering for JavaScript-loaded page metadata. It is off by default and needs a separate Playwright and Chromium setup. See [browser rendering setup and limits](browser-rendering.md). The web option is unavailable until both are installed.
+
 The local app uses only the Python standard library. Set `PORT` before starting the app when port 8000 is unavailable:
 
 ```bash

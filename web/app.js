@@ -30,6 +30,24 @@ const translations = {
     'audit.pages100': '100 页 · 完整',
     'audit.pages300': '300 页 · 最大',
     'audit.submit': '输入网址并开始巡检',
+    'audit.evidenceLabel': '可选：导入搜索 / AI 抽样数据（JSON）',
+    'audit.evidenceHelp': '只在本机汇总；不登录账号、不保存原始明细。',
+    'audit.evidenceFormat': '查看数据格式',
+    'audit.browserRenderLabel': '可选：用浏览器检查页面实际加载后的内容',
+    'audit.browserRenderHelp': '默认关闭；需要单独安装浏览器组件。只加载同站公开只读资源。',
+    'audit.browserRenderDocs': '查看安装和限制',
+    'audit.evidenceTooLarge': '数据文件不能超过 256 KiB。',
+    'audit.evidenceInvalid': '文件不是有效的 JSON。请检查文件后重试。',
+    'audit.cancel': '取消巡检',
+    'audit.progressLabel': '巡检进度',
+    'audit.progressStarting': '正在读取站点目录并准备检查…',
+    'audit.progressPages': '已检查 {processed} / {max} 个页面',
+    'audit.progressRendering': '浏览器复核中：已完成 {processed} / {max} 页',
+    'audit.progressComplete': '巡检完成。',
+    'audit.progressCancelled': '巡检已取消。',
+    'audit.progressTimeout': '巡检达到最长运行时间。',
+    'audit.progressFailed': '巡检未能完成，请查看上方提示。',
+    'audit.cancelRequested': '正在停止巡检，请稍候…',
     'audit.message': '默认阻止私网、回环和保留地址；不会提交表单、写入数据或执行答案引擎查询。',
     'empty.step': '02 / 报告会显示',
     'empty.title': '一份报告，帮你决定先改哪里。',
@@ -45,7 +63,14 @@ const translations = {
     'report.scoreWaiting': '等待评估',
     'report.scoreTitle': '这次检查结果怎么样',
     'report.scoreSummary': '完成检查后，这里会说明网站当前基础和最该先处理的问题。',
-    'report.coverage': '证据覆盖率',
+    'report.coverage': '检查证据完备度',
+    'report.coverageHelp': '这是已有检查项中能得出结论的比例，不是已抓取页面比例。',
+    'report.externalLabel': '补充数据',
+    'report.externalTitle': '外部数据观察',
+    'report.externalNote': '下列数字来自你导入的抽样或平台导出，不参与基础评分。',
+    'report.browserRenderLabel': '补充检查',
+    'report.browserRenderTitle': '浏览器渲染观察',
+    'report.browserRenderNote': '最多抽查 10 页；观察结果不参与评分，渲染后的网页内容不会保存。',
     'report.pending': '待补证据',
     'report.deductions': '扣分依据',
     'report.strengthsLabel': '已经具备',
@@ -113,6 +138,37 @@ const translations = {
     'coverage.none': '未抓取到页面。',
     'recommendation.next': '下一步：',
     'recommendation.none': '当前没有额外建议。',
+    'external.searchConsole': 'Search Console',
+    'external.period': '数据周期',
+    'external.rows': '页面行数',
+    'external.clicks': '点击',
+    'external.impressions': '展示',
+    'external.ctr': '汇总点击率',
+    'external.position': '按展示加权的平均排名',
+    'external.answerEngine': '答案引擎抽样',
+    'external.sampleSize': '抽样问题数',
+    'external.citations': '引用本站的问题数',
+    'external.citationRate': '抽样引用率',
+    'external.noPosition': '未提供',
+    'browser.summary': '浏览器检查汇总',
+    'browser.renderedPages': '成功渲染 / 抽样页面',
+    'browser.blockedRequests': '已拦截请求',
+    'browser.samplePage': '抽样页面',
+    'browser.statusCompleted': '完成',
+    'browser.statusFailed': '未完成',
+    'browser.http': 'HTTP',
+    'browser.title': '页面标题',
+    'browser.noTitle': '未检测到页面标题',
+    'browser.description': '摘要描述',
+    'browser.noDescription': '未检测到摘要描述',
+    'browser.h1': '一级标题',
+    'browser.noH1': '未检测到一级标题',
+    'browser.differences': '与静态抓取不同',
+    'browser.noDifferences': '未发现差异',
+    'browser.canonical': '规范网址',
+    'browser.language': '页面语言',
+    'browser.robots': '抓取指令',
+    'browser.structuredData': '结构化数据块',
     'prompt.none': '本次报告没有生成智能体提示词。',
     'prompt.website': '官网：',
     'copy.success': '已复制',
@@ -148,6 +204,24 @@ const translations = {
     'audit.pages100': '100 pages · Complete',
     'audit.pages300': '300 pages · Maximum',
     'audit.submit': 'Enter a URL and Start Audit',
+    'audit.evidenceLabel': 'Optional: import search or AI sample data (JSON)',
+    'audit.evidenceHelp': 'Summarized locally; no account login or raw rows are stored.',
+    'audit.evidenceFormat': 'View data format',
+    'audit.browserRenderLabel': 'Optional: check the page after it loads in a browser',
+    'audit.browserRenderHelp': 'Off by default; requires a separate browser setup. Only same-site public read-only resources are loaded.',
+    'audit.browserRenderDocs': 'View setup and limits',
+    'audit.evidenceTooLarge': 'The data file must be 256 KiB or smaller.',
+    'audit.evidenceInvalid': 'The file is not valid JSON. Check it and try again.',
+    'audit.cancel': 'Cancel audit',
+    'audit.progressLabel': 'Audit progress',
+    'audit.progressStarting': 'Reading site discovery files and preparing checks…',
+    'audit.progressPages': 'Checked {processed} / {max} pages',
+    'audit.progressRendering': 'Browser check: {processed} / {max} pages processed',
+    'audit.progressComplete': 'Audit complete.',
+    'audit.progressCancelled': 'Audit cancelled.',
+    'audit.progressTimeout': 'The audit reached its time limit.',
+    'audit.progressFailed': 'The audit could not be completed. See the message above.',
+    'audit.cancelRequested': 'Stopping the audit…',
     'audit.message': 'Blocks private, loopback and reserved addresses by default; no form submission, data writing or answer engine queries.',
     'empty.step': '02 / Report Shows',
     'empty.title': 'A report to help you decide what to fix first.',
@@ -163,7 +237,14 @@ const translations = {
     'report.scoreWaiting': 'Waiting for evaluation',
     'report.scoreTitle': 'How is this check result',
     'report.scoreSummary': 'After the check, this will explain the site\'s current baseline and what to handle first.',
-    'report.coverage': 'Evidence Coverage',
+    'report.coverage': 'Evidence completeness',
+    'report.coverageHelp': 'This is the share of checks with a conclusion, not the share of pages crawled.',
+    'report.externalLabel': 'Supplemental data',
+    'report.externalTitle': 'External data observations',
+    'report.externalNote': 'These figures come from your imported samples or platform export and do not affect the base score.',
+    'report.browserRenderLabel': 'Additional check',
+    'report.browserRenderTitle': 'Browser-rendered observations',
+    'report.browserRenderNote': 'Up to 10 pages are sampled. These observations do not affect the score, and rendered page HTML is not retained.',
     'report.pending': 'Pending Evidence',
     'report.deductions': 'Deduction Basis',
     'report.strengthsLabel': 'Already Have',
@@ -231,6 +312,37 @@ const translations = {
     'coverage.none': 'No pages were crawled.',
     'recommendation.next': 'Next step: ',
     'recommendation.none': 'No additional recommendations are available.',
+    'external.searchConsole': 'Search Console',
+    'external.period': 'Data period',
+    'external.rows': 'Page rows',
+    'external.clicks': 'Clicks',
+    'external.impressions': 'Impressions',
+    'external.ctr': 'Combined CTR',
+    'external.position': 'Impression-weighted average position',
+    'external.answerEngine': 'Answer-engine sample',
+    'external.sampleSize': 'Query samples',
+    'external.citations': 'Samples citing this site',
+    'external.citationRate': 'Sample citation rate',
+    'external.noPosition': 'Not provided',
+    'browser.summary': 'Browser check summary',
+    'browser.renderedPages': 'Rendered / sampled pages',
+    'browser.blockedRequests': 'Blocked requests',
+    'browser.samplePage': 'Sample page',
+    'browser.statusCompleted': 'Complete',
+    'browser.statusFailed': 'Incomplete',
+    'browser.http': 'HTTP',
+    'browser.title': 'Page title',
+    'browser.noTitle': 'No page title found',
+    'browser.description': 'Description',
+    'browser.noDescription': 'No description found',
+    'browser.h1': 'Main headings',
+    'browser.noH1': 'No main heading found',
+    'browser.differences': 'Different from static crawl',
+    'browser.noDifferences': 'No differences found',
+    'browser.canonical': 'Canonical URL',
+    'browser.language': 'Page language',
+    'browser.robots': 'Crawl directives',
+    'browser.structuredData': 'Structured data blocks',
     'prompt.none': 'No coding-agent prompts were generated for this audit.',
     'prompt.website': 'Website: ',
     'copy.success': 'Copied',
@@ -249,6 +361,7 @@ function applyLanguage(lang) {
   document.documentElement.lang = currentLang;
   const dict = translations[currentLang];
   document.title = dict['meta.title'];
+  document.querySelector('#audit-progress-bar')?.setAttribute('aria-label', translate('audit.progressLabel'));
   const description = document.querySelector('#page-description');
   if (description) description.content = dict['meta.description'];
 
@@ -277,6 +390,7 @@ function applyLanguage(lang) {
 
   if (latestResult) renderReport(latestResult, false);
   renderMessage();
+  if (latestAuditStatus) renderAuditProgress(latestAuditStatus);
 
   // Store preference
   try {
@@ -309,8 +423,13 @@ function initLanguageSwitcher() {
 const form = document.querySelector('#audit-form');
 const urlInput = document.querySelector('#target-url');
 const maxPagesInput = document.querySelector('#max-pages');
+const externalEvidenceFileInput = document.querySelector('#external-evidence-file');
 const submitButton = document.querySelector('#submit-button');
 const message = document.querySelector('#form-message');
+const auditProgress = document.querySelector('#audit-progress');
+const auditProgressText = document.querySelector('#audit-progress-text');
+const auditProgressBar = document.querySelector('#audit-progress-bar');
+const cancelAuditButton = document.querySelector('#cancel-audit');
 const emptyState = document.querySelector('#empty-state');
 const report = document.querySelector('#report');
 const scoreValue = document.querySelector('#score-value');
@@ -325,15 +444,24 @@ const findingsList = document.querySelector('#findings-list');
 const filters = document.querySelector('#severity-filters');
 const coverageList = document.querySelector('#coverage-list');
 const recommendationsList = document.querySelector('#recommendations-list');
+const externalEvidenceSection = document.querySelector('#external-evidence-section');
+const externalEvidenceList = document.querySelector('#external-evidence-list');
+const browserRenderCheckbox = document.querySelector('#render-browser');
+const browserRenderSection = document.querySelector('#browser-render-section');
+const browserRenderList = document.querySelector('#browser-render-list');
 const agentSelector = document.querySelector('#agent-selector');
 const agentPromptName = document.querySelector('#agent-prompt-name');
 const agentPromptWebsite = document.querySelector('#agent-prompt-website');
 const agentPromptContent = document.querySelector('#agent-prompt-content');
 const copyAgentPromptButton = document.querySelector('#copy-agent-prompt');
+const MAX_EXTERNAL_EVIDENCE_BYTES = 262144;
 let latestResult = null;
 let activeSeverity = 'all';
 let activeAgent = 'codex';
 let messageState = { key: 'audit.message', text: '', isError: false };
+let auditInProgress = false;
+let auditProgressTimer = null;
+let latestAuditStatus = null;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initLanguageSwitcher);
@@ -370,6 +498,51 @@ function showMessage(text, isError = false) {
 function showTranslatedMessage(key, isError = false) {
   messageState = { key, text: '', isError };
   renderMessage();
+}
+
+function renderAuditProgress(status) {
+  if (!status || status.status === 'idle') return;
+  latestAuditStatus = status;
+  auditProgress.classList.remove('hidden');
+  if (status.running) {
+    const processed = Number(status.pages_processed) || 0;
+    const max = Number(status.max_pages) || 0;
+    const progressMessage = status.phase === 'browser_render'
+      ? translate('audit.progressRendering')
+      : translate('audit.progressPages');
+    auditProgressText.textContent = processed
+      ? progressMessage.replace('{processed}', processed).replace('{max}', max)
+      : translate('audit.progressStarting');
+    auditProgressBar.value = max ? Math.min(100, Math.round((processed / max) * 100)) : 0;
+    cancelAuditButton.classList.remove('hidden');
+    cancelAuditButton.disabled = false;
+    return;
+  }
+
+  const messages = {
+    starting: 'audit.progressStarting',
+    completed: 'audit.progressComplete',
+    cancelled: 'audit.progressCancelled',
+    timeout: 'audit.progressTimeout',
+    failed: 'audit.progressFailed',
+  };
+  const messageKey = messages[status.status];
+  if (messageKey) auditProgressText.textContent = translate(messageKey);
+  if (status.status === 'completed') auditProgressBar.value = 100;
+  cancelAuditButton.classList.add('hidden');
+  cancelAuditButton.disabled = false;
+}
+
+async function refreshAuditProgress() {
+  try {
+    const response = await fetch('/api/audit/status', { cache: 'no-store' });
+    if (response.ok) {
+      const status = await response.json();
+      if (!auditInProgress || status.running) renderAuditProgress(status);
+    }
+  } catch {
+    // The audit response remains the source of truth if progress polling fails.
+  }
 }
 
 function renderSummary(summary) {
@@ -479,6 +652,84 @@ function renderCoverage(pages) {
   `).join('') || `<p class="empty-findings">${escapeHtml(translate('coverage.none'))}</p>`;
 }
 
+function renderExternalEvidence(evidence) {
+  const cards = [];
+  const searchConsole = evidence?.search_console;
+  if (searchConsole) {
+    const position = searchConsole.average_position === null
+      ? translate('external.noPosition')
+      : searchConsole.average_position;
+    cards.push(`
+      <article class="summary-card">
+        <span class="label">${escapeHtml(translate('external.searchConsole'))} · ${escapeHtml(translate('external.period'))}: ${escapeHtml(searchConsole.period_start)} – ${escapeHtml(searchConsole.period_end)}</span>
+        <strong>${escapeHtml(searchConsole.ctr_percent)}%</strong>
+        <p>${escapeHtml(translate('external.rows'))}: ${escapeHtml(searchConsole.page_rows)} · ${escapeHtml(translate('external.clicks'))}: ${escapeHtml(searchConsole.clicks)} · ${escapeHtml(translate('external.impressions'))}: ${escapeHtml(searchConsole.impressions)} · ${escapeHtml(translate('external.position'))}: ${escapeHtml(position)}</p>
+      </article>
+    `);
+  }
+  (evidence?.answer_engine_samples || []).forEach((sample) => {
+    cards.push(`
+      <article class="summary-card">
+        <span class="label">${escapeHtml(translate('external.answerEngine'))} · ${escapeHtml(sample.checked_at)}</span>
+        <strong>${escapeHtml(sample.citation_rate_percent)}%</strong>
+        <p>${escapeHtml(sample.engine)} · ${escapeHtml(translate('external.citations'))}: ${escapeHtml(sample.queries_with_site_citation)} / ${escapeHtml(sample.query_samples)} ${escapeHtml(translate('external.sampleSize').toLowerCase())}</p>
+      </article>
+    `);
+  });
+  externalEvidenceList.innerHTML = cards.join('');
+  externalEvidenceSection.classList.toggle('hidden', cards.length === 0);
+}
+
+function renderBrowserEvidence(rendering, pages) {
+  if (!rendering?.enabled) {
+    browserRenderSection.classList.add('hidden');
+    browserRenderList.innerHTML = '';
+    return;
+  }
+
+  const cards = [`
+    <article class="summary-card">
+      <span class="label">${escapeHtml(translate('browser.summary'))}</span>
+      <strong>${escapeHtml(rendering.rendered_pages ?? 0)} / ${escapeHtml(rendering.sampled_pages ?? 0)}</strong>
+      <p>${escapeHtml(translate('browser.renderedPages'))} · ${escapeHtml(translate('browser.blockedRequests'))}: ${escapeHtml(rendering.blocked_requests ?? 0)}</p>
+    </article>
+  `];
+  const fieldLabels = {
+    title: translate('browser.title'),
+    meta_description: translate('browser.description'),
+    canonical: translate('browser.canonical'),
+    html_lang: translate('browser.language'),
+    robots_directive: translate('browser.robots'),
+    h1: translate('browser.h1'),
+    json_ld_static_count: translate('browser.structuredData'),
+  };
+  (pages || []).forEach((page, index) => {
+    const observation = page.browser_render;
+    if (!observation) return;
+    const status = observation.status === 'completed'
+      ? translate('browser.statusCompleted')
+      : translate('browser.statusFailed');
+    const title = observation.title || translate('browser.noTitle');
+    const description = observation.meta_description || translate('browser.noDescription');
+    const headings = (observation.h1 || []).join('、') || translate('browser.noH1');
+    const differences = (observation.differences || [])
+      .map((field) => fieldLabels[field] || field)
+      .join('、') || translate('browser.noDifferences');
+    cards.push(`
+      <article class="summary-card">
+        <span class="label">${escapeHtml(translate('browser.samplePage'))} ${index + 1} · ${escapeHtml(status)} · ${escapeHtml(translate('browser.http'))} ${escapeHtml(observation.http_status ?? '—')}</span>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(translate('browser.description'))}: ${escapeHtml(description)}</p>
+        <p>${escapeHtml(translate('browser.h1'))}: ${escapeHtml(headings)}</p>
+        <p>${escapeHtml(translate('browser.differences'))}: ${escapeHtml(differences)}</p>
+        ${observation.error ? `<p>${escapeHtml(observation.error)}</p>` : ''}
+      </article>
+    `);
+  });
+  browserRenderList.innerHTML = cards.join('');
+  browserRenderSection.classList.remove('hidden');
+}
+
 function renderRecommendations() {
   const recommendations = latestResult.audit.recommendations || [];
   recommendationsList.innerHTML = recommendations.map((item) => `
@@ -534,6 +785,8 @@ function renderReport(result, scrollToReport = true) {
   document.querySelector('#report-meta').textContent = formatReportMeta(audit);
   renderScore(audit.score);
   renderSummary(audit.summary);
+  renderExternalEvidence(audit.external_evidence);
+  renderBrowserEvidence(audit.browser_rendering, audit.pages);
   renderStrengths();
   renderFilters();
   renderFindings();
@@ -589,17 +842,49 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
+  let externalEvidence = null;
+  const evidenceFile = externalEvidenceFileInput.files?.[0];
+  if (evidenceFile) {
+    if (evidenceFile.size > MAX_EXTERNAL_EVIDENCE_BYTES) {
+      showTranslatedMessage('audit.evidenceTooLarge', true);
+      return;
+    }
+    try {
+      externalEvidence = JSON.parse(await evidenceFile.text());
+      if (!externalEvidence || typeof externalEvidence !== 'object' || Array.isArray(externalEvidence)) {
+        throw new Error('invalid evidence object');
+      }
+    } catch {
+      showTranslatedMessage('audit.evidenceInvalid', true);
+      return;
+    }
+  }
+
   latestResult = null;
   report.classList.add('hidden');
   emptyState.classList.remove('hidden');
   submitButton.disabled = true;
   submitButton.innerHTML = `<span class="loading-dot"></span><span>${escapeHtml(translate('loading'))}</span>`;
   showTranslatedMessage('message.running');
+  auditInProgress = true;
+  renderAuditProgress({
+    running: false,
+    status: 'starting',
+    pages_processed: 0,
+    max_pages: Number(maxPagesInput.value),
+  });
+  auditProgressTimer = window.setInterval(refreshAuditProgress, 1000);
   try {
+    const requestPayload = {
+      url: target,
+      max_pages: Number(maxPagesInput.value),
+      render_browser: browserRenderCheckbox.checked,
+    };
+    if (externalEvidence !== null) requestPayload.external_evidence = externalEvidence;
     const response = await fetch('/api/audit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: target, max_pages: Number(maxPagesInput.value) }),
+      body: JSON.stringify(requestPayload),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || translate('message.failed'));
@@ -608,8 +893,35 @@ form.addEventListener('submit', async (event) => {
   } catch (error) {
     showMessage(error.message || translate('message.failed'), true);
   } finally {
+    auditInProgress = false;
+    if (auditProgressTimer !== null) {
+      window.clearInterval(auditProgressTimer);
+      auditProgressTimer = null;
+    }
+    await refreshAuditProgress();
     submitButton.disabled = false;
     submitButton.innerHTML = `<span data-i18n="audit.submit">${escapeHtml(translate('audit.submit'))}</span><span aria-hidden="true">↗</span>`;
+  }
+});
+
+cancelAuditButton.addEventListener('click', async () => {
+  if (!auditInProgress) return;
+  cancelAuditButton.disabled = true;
+  showTranslatedMessage('audit.cancelRequested');
+  try {
+    const response = await fetch('/api/audit/cancel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-SearchScope-Request': 'same-origin',
+      },
+      body: '{}',
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || translate('message.failed'));
+  } catch (error) {
+    showMessage(error.message || translate('message.failed'), true);
+    cancelAuditButton.disabled = false;
   }
 });
 

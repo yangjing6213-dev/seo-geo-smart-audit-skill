@@ -1,0 +1,2 @@
+# Optional dependency for explicitly requested browser-rendered checks.
+playwright>=1.48,<2

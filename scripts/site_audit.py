@@ -34,6 +34,11 @@ from urllib.robotparser import RobotFileParser
 import xml.etree.ElementTree as ET
 
 from html_report import html_report
+from external_evidence import (
+    ExternalEvidenceError,
+    MAX_EXTERNAL_EVIDENCE_BYTES,
+    summarize_external_evidence,
+)
 
 
 DEFAULT_USER_AGENT = "IndependentSiteSeoGeoAudit/1.0 (+read-only)"
@@ -175,11 +180,25 @@ def normalized_url(url: str) -> str:
 
 def origin_for(url: str) -> str:
     parsed = urlsplit(url)
-    return urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), "", "", ""))
+    scheme = parsed.scheme.lower()
+    hostname = parsed.hostname
+    if scheme not in {"http", "https"} or not hostname:
+        return ""
+    try:
+        host = hostname.encode("idna").decode("ascii").lower()
+        port = parsed.port
+    except (UnicodeError, ValueError):
+        return ""
+    if ":" in host and not host.startswith("["):
+        host = f"[{host}]"
+    default_port = 80 if scheme == "http" else 443 if scheme == "https" else None
+    authority = host if port is None or port == default_port else f"{host}:{port}"
+    return f"{scheme}://{authority}"
 
 
 def same_origin(left: str, right: str) -> bool:
-    return origin_for(left) == origin_for(right)
+    left_origin = origin_for(left)
+    return bool(left_origin) and left_origin == origin_for(right)
 
 
 def validate_url_structure(url: str):
@@ -601,11 +620,21 @@ def fetch_url(
     allow_private: bool,
     max_redirects: int = 5,
     check_control: Callable[[], float | None] | None = None,
-) -> tuple[dict[str, Any], str]:
+    return_bytes: bool = False,
+    follow_redirects: bool = True,
+    allowed_origin: str | None = None,
+) -> tuple[dict[str, Any], str | bytes]:
     timeout = validate_request_timeout(timeout)
     candidate = url
     validate_url_structure(candidate)
     candidate = normalized_url(candidate)
+    empty_body: str | bytes = b"" if return_bytes else ""
+    validated_origin = None
+    if allowed_origin is not None:
+        validate_url_structure(allowed_origin)
+        validated_origin = origin_for(allowed_origin)
+        if origin_for(candidate) != validated_origin:
+            raise ValueError("URL is outside the allowed origin")
     max_redirects = validate_max_redirects(max_redirects)
     history: list[dict[str, Any]] = []
     context = ssl.create_default_context()
@@ -635,7 +664,7 @@ def fetch_url(
                 "redirects": history,
                 "elapsed_ms": round((time.perf_counter() - started) * 1000),
             },
-            "",
+            empty_body,
         )
 
     while True:
@@ -686,7 +715,7 @@ def fetch_url(
                     "redirects": history,
                     "elapsed_ms": round((time.perf_counter() - started) * 1000),
                 },
-                "",
+                empty_body,
             )
         finally:
             if response is not None:
@@ -696,6 +725,8 @@ def fetch_url(
         if status in REDIRECT_STATUSES and headers.get("Location"):
             try:
                 next_url = normalized_url(urljoin(current, headers["Location"]))
+                if validated_origin and origin_for(next_url) != validated_origin:
+                    raise ValueError("Redirect target is outside the allowed origin")
                 next_resolved_addresses = resolve_url(
                     next_url,
                     allow_private,
@@ -718,7 +749,7 @@ def fetch_url(
                         "redirects": history,
                         "elapsed_ms": elapsed_ms,
                     },
-                    "",
+                    empty_body,
                 )
             if len(history) >= max_redirects:
                 return (
@@ -730,7 +761,26 @@ def fetch_url(
                         "redirects": history,
                         "elapsed_ms": elapsed_ms,
                     },
-                    "",
+                    empty_body,
+                )
+            if not follow_redirects:
+                content_type = headers.get_content_type() if hasattr(headers, "get_content_type") else ""
+                charset = headers.get_content_charset() if hasattr(headers, "get_content_charset") else None
+                return (
+                    {
+                        "requested_url": url,
+                        "final_url": current,
+                        "status": status,
+                        "content_type": content_type,
+                        "content_charset": charset,
+                        "bytes_read": 0,
+                        "truncated": False,
+                        "redirects": history,
+                        "redirect_url": next_url,
+                        "elapsed_ms": elapsed_ms,
+                        "error": None,
+                    },
+                    empty_body,
                 )
             history.append({"status": status, "from": current, "to": next_url})
             current = next_url
@@ -741,23 +791,27 @@ def fetch_url(
         body = body[:max_bytes]
         content_type = headers.get_content_type() if hasattr(headers, "get_content_type") else ""
         charset = headers.get_content_charset() if hasattr(headers, "get_content_charset") else None
-        try:
-            text = body.decode(charset or "utf-8", errors="replace")
-        except LookupError:
-            text = body.decode("utf-8", errors="replace")
+        if return_bytes:
+            response_body: str | bytes = body
+        else:
+            try:
+                response_body = body.decode(charset or "utf-8", errors="replace")
+            except LookupError:
+                response_body = body.decode("utf-8", errors="replace")
         return (
             {
                 "requested_url": url,
                 "final_url": current,
                 "status": status,
                 "content_type": content_type,
+                "content_charset": charset,
                 "bytes_read": len(body),
                 "truncated": truncated,
                 "redirects": history,
                 "elapsed_ms": elapsed_ms,
                 "error": None,
             },
-            text,
+            response_body,
         )
 
 
@@ -1607,7 +1661,7 @@ def build_score(audit: dict[str, Any]) -> dict[str, Any]:
             {"finding_id": item["id"], "status": item["status"], "issue": item["issue"]}
             for item in pending_items
         ],
-        "method": "满分 100，最低 0；按问题项扣分，仅计算 verified：严重 25、高 15、中 7、低 3、信息 0。待渲染或待外部数据项目不扣分。本分数用于安排修复优先级，不代表搜索排名或流量预测。",
+        "method": "满分 100，最低 0；按问题项扣分，仅计算 verified：严重 25、高 15、中 7、低 3、信息 0。待渲染或待外部数据项目不扣分。证据完备度是已验证优势与已验证问题占全部检查项的比例，不代表页面抓取覆盖。本分数用于安排修复优先级，不代表搜索排名或流量预测。",
     }
 
 
@@ -1709,6 +1763,7 @@ def audit_site(
     max_redirects: int = 5,
     user_agent: str = DEFAULT_USER_AGENT,
     allow_private: bool = False,
+    render_browser: bool = False,
     total_timeout: float | None = None,
     should_cancel: Callable[[], bool] | None = None,
     on_progress: Callable[[dict[str, Any]], None] | None = None,
@@ -1732,6 +1787,12 @@ def audit_site(
     validate_url_structure(url)
     start_url = normalized_url(url)
     site_origin = origin_for(start_url)
+    if render_browser:
+        if allow_private:
+            raise ValueError("Browser rendering is available only for public targets")
+        from browser_render import ensure_browser_runtime
+
+        ensure_browser_runtime()
     fetch_options = {
         "timeout": timeout,
         "max_bytes": max_bytes,
@@ -1847,6 +1908,19 @@ def audit_site(
         if delay:
             controlled_sleep(delay, check_control)
 
+    browser_rendering = None
+    if render_browser:
+        from browser_render import render_browser_pages
+
+        browser_rendering = render_browser_pages(
+            pages,
+            site_origin=site_origin,
+            user_agent=user_agent,
+            timeout=timeout,
+            check_control=check_control,
+            on_progress=on_progress,
+        )
+
     robots_ai_bot_access = {
         category: {
             bot: robots_parser.can_fetch(bot, start_url) if robots_parser else None
@@ -1864,7 +1938,11 @@ def audit_site(
             "max_pages": max_pages,
             "allow_private": allow_private,
             "limitations": [
-                "Static HTML only; client-rendered metadata and JSON-LD require browser verification.",
+                (
+                    "Base score uses static HTML; optional browser observations are supplemental and do not change the score."
+                    if browser_rendering is not None
+                    else "Static HTML only; client-rendered metadata and JSON-LD require browser verification."
+                ),
                 "HTTP timing is not Core Web Vitals.",
                 "No Search Console, analytics, backlink, ranking, or answer-engine data is collected.",
             ],
@@ -1882,6 +1960,11 @@ def audit_site(
         },
         "pages": pages,
     }
+    if browser_rendering is not None:
+        audit["browser_rendering"] = browser_rendering
+        audit["meta"]["limitations"].append(
+            "Browser observations cover at most 10 pages; only same-origin public GET requests are routed through the safe fetcher. Cross-origin resources, forms, WebSockets, images, fonts, media, and service workers are blocked. Rendered HTML is not retained and browser observations do not change the score."
+        )
     audit["summary"] = {
         "pages_crawled": len(pages),
         "html_pages": sum(1 for page in pages if page.get("is_html")),
@@ -1929,7 +2012,8 @@ def markdown_report(audit: dict[str, Any]) -> str:
             "## 结果评估",
             "",
             f"- 总分：{score['overall']}/100（{score['label']}）",
-            f"- 证据覆盖率：{score['evidence_coverage']}%",
+            f"- 检查证据完备度：{score['evidence_coverage']}%",
+            "- 口径：已验证优势与已验证问题占全部检查项的比例；不代表页面抓取覆盖率。",
             f"- 已验证问题：{score['verified_finding_count']} 项",
             f"- 待补证据：{score['pending_count']} 项（不计入扣分）",
             f"- 评估结论：{score['summary']}",
@@ -1954,6 +2038,84 @@ def markdown_report(audit: dict[str, Any]) -> str:
         )
     else:
         lines.append("- 本次没有待补证据项目。")
+    external_evidence = audit.get("external_evidence")
+    if external_evidence:
+        lines.extend(["", "## 外部数据补充（用户导入）", ""])
+        search_console = external_evidence.get("search_console")
+        if search_console:
+            average_position = search_console["average_position"]
+            lines.extend(
+                [
+                    "### Search Console",
+                    "",
+                    f"- 数据周期：{search_console['period_start']} 至 {search_console['period_end']}",
+                    f"- 页面行数：{search_console['page_rows']}",
+                    f"- 点击 / 展示：{search_console['clicks']} / {search_console['impressions']}",
+                    f"- 汇总点击率：{search_console['ctr_percent']}%",
+                    f"- 按展示加权的平均排名：{average_position if average_position is not None else '未提供'}",
+                    "",
+                ]
+            )
+        if external_evidence.get("answer_engine_samples"):
+            lines.extend(["### 答案引擎抽样", ""])
+            for item in external_evidence["answer_engine_samples"]:
+                engine = str(item["engine"]).replace("`", "\\`")
+                lines.append(
+                    f"- `{engine}`（{item['checked_at']}）：{item['queries_with_site_citation']} / "
+                    f"{item['query_samples']} 条抽样引用了本站，抽样引用率 {item['citation_rate_percent']}%。"
+                )
+            lines.append("")
+        lines.append("外部数据仅作为补充观察；原始行和查询内容不会写入报告，也不参与评分。")
+        lines.append("")
+    browser_rendering = audit.get("browser_rendering")
+    if isinstance(browser_rendering, dict) and browser_rendering.get("enabled"):
+        lines.extend(
+            [
+                "## 浏览器渲染观察（补充证据，不参与评分）",
+                "",
+                f"- 可渲染页面：{browser_rendering.get('eligible_pages', 0)}；本次抽样：{browser_rendering.get('sampled_pages', 0)}；成功：{browser_rendering.get('rendered_pages', 0)}；失败：{browser_rendering.get('failed_pages', 0)}。",
+                f"- 被拦截的浏览器请求：{browser_rendering.get('blocked_requests', 0)}。最多检查 10 页；只保留提取出的元数据，不保留渲染后的 HTML。",
+                "",
+            ]
+        )
+        for index, page in enumerate(audit["pages"], start=1):
+            observation = page.get("browser_render")
+            if not isinstance(observation, dict):
+                continue
+            rendered_fields = {
+                key: observation.get(key)
+                for key in (
+                    "http_status",
+                    "title",
+                    "meta_description",
+                    "canonical",
+                    "html_lang",
+                    "robots_directive",
+                    "h1_count",
+                    "h1",
+                    "json_ld_static_count",
+                    "json_ld_static_valid_count",
+                    "differences",
+                    "error",
+                )
+                if key in observation
+            }
+            rendered_json = json.dumps(rendered_fields, ensure_ascii=False, indent=2)
+            longest_fence = max(
+                (len(match.group(0)) for match in re.finditer(r"`+", rendered_json)),
+                default=0,
+            )
+            fence = "`" * max(3, longest_fence + 1)
+            lines.extend(
+                [
+                    f"### 抽样页面 {index}（{observation.get('status', 'unknown')}）",
+                    "",
+                    f"{fence}json",
+                    rendered_json,
+                    fence,
+                    "",
+                ]
+            )
     lines.extend(
         [
             "",
@@ -2059,9 +2221,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--user-agent", default=DEFAULT_USER_AGENT)
     parser.add_argument("--allow-private", action="store_true", help="Allow private/loopback targets for explicitly authorized local testing")
+    parser.add_argument(
+        "--render-browser",
+        action="store_true",
+        help="Optionally render up to 10 pages with Playwright (requires the optional Chromium setup)",
+    )
     parser.add_argument("--json-out", type=Path, help="Write complete audit JSON to this path")
     parser.add_argument("--markdown-out", type=Path, help="Write Markdown findings to this path")
     parser.add_argument("--html-out", type=Path, help="Write a self-contained HTML report to this path")
+    parser.add_argument(
+        "--external-evidence",
+        type=Path,
+        help="Optional local JSON file with Search Console or answer-engine sample data",
+    )
     return parser
 
 
@@ -2070,6 +2242,22 @@ def main() -> int:
     if args.max_pages < 1 or args.max_pages > 5000:
         print("--max-pages must be between 1 and 5000", file=sys.stderr)
         return 2
+    if args.render_browser and args.allow_private:
+        print("--render-browser cannot be combined with --allow-private", file=sys.stderr)
+        return 2
+    external_evidence = None
+    if args.external_evidence:
+        try:
+            if args.external_evidence.stat().st_size > MAX_EXTERNAL_EVIDENCE_BYTES:
+                raise ExternalEvidenceError("外部数据文件超过 256 KiB 限制。")
+            evidence_package = json.loads(args.external_evidence.read_text(encoding="utf-8"))
+            external_evidence = summarize_external_evidence(evidence_package, args.url)
+        except OSError:
+            print("Could not read the external evidence file.", file=sys.stderr)
+            return 2
+        except (UnicodeDecodeError, ValueError, RecursionError) as exc:
+            print(f"Invalid external evidence file: {exc}", file=sys.stderr)
+            return 2
     try:
         audit = audit_site(
             args.url,
@@ -2081,10 +2269,14 @@ def main() -> int:
             max_redirects=args.max_redirects,
             user_agent=args.user_agent,
             allow_private=args.allow_private,
+            render_browser=args.render_browser,
         )
     except (AuditCancelledError, AuditTimeoutError, ValueError, OSError) as exc:
         print(f"Audit failed: {exc}", file=sys.stderr)
         return 2
+
+    if external_evidence is not None:
+        audit["external_evidence"] = external_evidence
 
     if args.json_out:
         args.json_out.parent.mkdir(parents=True, exist_ok=True)

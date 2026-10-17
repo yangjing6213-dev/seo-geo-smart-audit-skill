@@ -72,10 +72,29 @@
               <option value="300" data-i18n="audit.pages300">300 页 · 最大</option>
             </select>
           </label>
+          <label class="evidence-field" for="external-evidence-file">
+            <span data-i18n="audit.evidenceLabel">可选：导入搜索 / AI 抽样数据（JSON）</span>
+            <input id="external-evidence-file" name="external-evidence" type="file" accept=".json,application/json"/>
+            <small><span data-i18n="audit.evidenceHelp">只在本机汇总；不登录账号、不保存原始明细。</span> <a href="/docs/external-evidence.md" target="_blank" rel="noreferrer" data-i18n="audit.evidenceFormat">查看数据格式</a></small>
+          </label>
+          <label class="render-browser-option" for="render-browser">
+            <input id="render-browser" name="render-browser" type="checkbox"/>
+            <span>
+              <span data-i18n="audit.browserRenderLabel">可选：用浏览器检查页面实际加载后的内容</span>
+              <small><span data-i18n="audit.browserRenderHelp">默认关闭；需要单独安装浏览器组件。只加载同站公开只读资源。</span> <a href="/docs/browser-rendering.md" target="_blank" rel="noreferrer" data-i18n="audit.browserRenderDocs">查看安装和限制</a></small>
+            </span>
+          </label>
           <button id="submit-button" class="primary-button" type="submit">
             <span data-i18n="audit.submit">输入网址并开始巡检</span><span aria-hidden="true">↗</span>
           </button>
         </form>
+        <div class="audit-run-controls">
+          <div id="audit-progress" class="audit-progress hidden" role="status" aria-live="polite">
+            <span id="audit-progress-text" data-i18n="audit.progressStarting">正在准备巡检…</span>
+            <progress id="audit-progress-bar" max="100" value="0" aria-label="巡检进度"></progress>
+          </div>
+          <button id="cancel-audit" class="secondary-button hidden" type="button" data-i18n="audit.cancel">取消巡检</button>
+        </div>
         <p id="form-message" class="form-message" role="status" data-i18n="audit.message">
           默认阻止私网、回环和保留地址；不会提交表单、写入数据或执行答案引擎查询。
         </p>
@@ -117,14 +136,33 @@
             <h3 id="score-title" data-i18n="report.scoreTitle">这次检查结果怎么样</h3>
             <p id="score-summary" data-i18n="report.scoreSummary">完成检查后，这里会说明网站当前基础和最该先处理的问题。</p>
             <div class="score-facts">
-              <div><span data-i18n="report.coverage">证据覆盖率</span><strong id="score-coverage">--%</strong></div>
+              <div><span data-i18n="report.coverage">检查证据完备度</span><strong id="score-coverage">--%</strong></div>
               <div><span data-i18n="report.pending">待补证据</span><strong id="score-pending">-- 项</strong></div>
             </div>
+            <p class="coverage-meaning" data-i18n="report.coverageHelp">这是已有检查项中能得出结论的比例，不是已抓取页面比例。</p>
           </div>
           <div class="score-breakdown">
             <p class="section-kicker" data-i18n="report.deductions">扣分依据</p>
             <div id="score-deductions" class="score-deductions"></div>
           </div>
+        </section>
+
+        <section id="external-evidence-section" class="external-evidence-section hidden" aria-labelledby="external-evidence-title">
+          <div>
+            <p class="section-kicker" data-i18n="report.externalLabel">补充数据</p>
+            <h3 id="external-evidence-title" data-i18n="report.externalTitle">外部数据观察</h3>
+            <p class="external-evidence-note" data-i18n="report.externalNote">下列数字来自你导入的抽样或平台导出，不参与基础评分。</p>
+          </div>
+          <div id="external-evidence-list" class="summary-grid"></div>
+        </section>
+
+        <section id="browser-render-section" class="external-evidence-section hidden" aria-labelledby="browser-render-title">
+          <div>
+            <p class="section-kicker" data-i18n="report.browserRenderLabel">补充检查</p>
+            <h3 id="browser-render-title" data-i18n="report.browserRenderTitle">浏览器渲染观察</h3>
+            <p class="external-evidence-note" data-i18n="report.browserRenderNote">最多抽查 10 页；观察结果不参与评分，渲染后的网页内容不会保存。</p>
+          </div>
+          <div id="browser-render-list" class="summary-grid"></div>
         </section>
 
         <div id="summary-cards" class="summary-grid"></div>
