@@ -1,18 +1,22 @@
 # SearchScope｜独立站 SEO/GEO 智能巡检
 
+> 只读检查公开独立站点，把已确认的问题与仍需补充的信息分开整理。
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) [![Apache-2.0](https://img.shields.io/badge/Apache--2.0-D22128?style=flat-square)](LICENSE)
+
+
+![项目封面](assets/portfolio-promo-2026-11-02/cover-zh.jpg)
+
+英文封面与配图：[English cover](assets/portfolio-promo-2026-11-02/cover-en.jpg) · [English overview](assets/portfolio-promo-2026-11-02/overview-en.jpg)
+
 > 帮助独立站经营者和 AI 创作者检查公开网站的 SEO 与 GEO 基础，并整理出带证据的改进清单。
 
 网站能打开，不代表搜索引擎和 AI 工具都能正确读取它。SearchScope 会按公开页面上的证据逐项检查，并把“已经确认的问题”和“还需要更多资料才能判断的部分”分开说明。它只做巡检，不会替你修改网站，也不保证排名或 AI 引用结果。
 
 [简体中文](README.md) | [English](README.en.md)
 
-[![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
 
-![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-used-F7DF1E?logo=javascript&logoColor=222) ![HTML5](https://img.shields.io/badge/HTML5-used-E34F26?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-used-663399?logo=css3&logoColor=white) [![Apache-2.0](https://img.shields.io/github/license/yangjing6213-dev/seo-geo-smart-audit-skill)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/blob/main/LICENSE)
 
-![SearchScope 项目封面](assets/project-cover.png)
-
-> 图片是项目封面示意，不是实际巡检页面。图中分数、趋势和数据均为视觉示例，不代表真实网站的审计结果。
 
 ## 目录
 
@@ -46,6 +50,11 @@ SearchScope 是一个面向公开独立网站的只读巡检工具，包含三�
 
 <a id="see-results"></a>
 ## 二、先看效果
+### 项目流程图（概念示意）
+
+![项目流程概念示意](assets/portfolio-promo-2026-11-02/overview-zh.jpg)
+
+> AI 概念插画：展示项目思路，不代表真实软件界面、运行数据或实际结果。
 
 ![SearchScope 本地网页入口的实际巡检结果](assets/screenshots/enhe-tech-site-audit-zh-CN.png)
 
@@ -225,7 +234,6 @@ python scripts/site_audit.py https://example.com --max-pages 25 --json-out audit
 | app.py、web/ | 本地网页服务和中英文界面。 |
 | references/audit-rubric.md | 问题分级与评分规则。 |
 | assets/audit-report-template.md | 报告模板，不是实际运行结果。 |
-| assets/logo.png、assets/project-cover.png | 项目标志和封面图。 |
 | assets/screenshots/ | README 中展示的实际巡检画面。 |
 | assets/ASSET_PROVENANCE.md | 项目图片素材的来源与使用记录。 |
 | docs/browser-rendering.md | 可选浏览器复核的安装方法和限制。 |

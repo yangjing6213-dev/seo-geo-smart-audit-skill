@@ -1,18 +1,29 @@
 # SearchScope | Independent-Site SEO/GEO Auditor
 
+> Read public independent websites and separate confirmed issues from questions that need more evidence.
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) [![Apache-2.0](https://img.shields.io/badge/Apache--2.0-D22128?style=flat-square)](LICENSE)
+
+
+![Project cover](assets/portfolio-promo-2026-11-02/cover-en.jpg)
+
+中文封面与配图：[封面](assets/portfolio-promo-2026-11-02/cover-zh.jpg) · [配图](assets/portfolio-promo-2026-11-02/overview-zh.jpg)
+
 > Helps independent website owners and AI creators review public-site SEO and GEO basics, then turn evidence into a practical improvement list.
 
 A website opening in a browser does not mean search engines and AI tools can read it correctly. SearchScope checks public-page evidence and separates confirmed findings from items that need more information. It is read-only: it will not change your website, and it does not promise rankings or AI citations.
 
 [简体中文](README.md) | [English](README.en.md)
 
-[![CI](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/ci.yml) [![CodeQL](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml/badge.svg)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/actions/workflows/codeql.yml)
 
-![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-used-F7DF1E?logo=javascript&logoColor=222) ![HTML5](https://img.shields.io/badge/HTML5-used-E34F26?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-used-663399?logo=css3&logoColor=white) [![Apache-2.0](https://img.shields.io/github/license/yangjing6213-dev/seo-geo-smart-audit-skill)](https://github.com/yangjing6213-dev/seo-geo-smart-audit-skill/blob/main/LICENSE)
 
-![SearchScope project cover](assets/project-cover-en.png)
 
-> This cover is an illustration, not a screenshot of a real audit. Scores, trends, and figures in the image are visual examples, not results from a real website.
+## Workflow diagram (AI concept illustration)
+### Workflow illustration (concept only)
+
+![Project workflow concept illustration](assets/portfolio-promo-2026-11-02/overview-en.jpg)
+
+> AI-generated concept illustration: workflow only, not a real interface, runtime data, or result.
 
 ## Contents
 
@@ -225,7 +236,6 @@ The local web app and command-line tool fetch pages and produce rule-based findi
 | app.py, web/ | Local web server and bilingual interface. |
 | references/audit-rubric.md | Issue levels and scoring rules. |
 | assets/audit-report-template.md | Report template, not a completed audit. |
-| assets/logo-en.png, assets/project-cover-en.png | Project logo and cover. |
 | assets/screenshots/ | Actual audit screens shown in the README. |
 | assets/ASSET_PROVENANCE.md | Source and use record for project images. |
 | docs/browser-rendering.md | Optional browser-review setup and limits. |
